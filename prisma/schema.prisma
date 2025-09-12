@@ -29,6 +29,7 @@ model UserDB {
   updatedAt         DateTime @updatedAt
   queryLogs         QueryLog[]
   tableUsages       TableUsage[]
+  topSlowQueries    TopSlowQuery[]
 }
 
 model QueryLog {
@@ -51,4 +52,19 @@ model TableUsage {
   callCount Int      @default(0)
   lastUsed  DateTime @default(now())
   createdAt DateTime @default(now())
+}
+
+model TopSlowQuery {
+  id           String   @id @default(uuid())
+  userDbId     String
+  userDb       UserDB   @relation(fields: [userDbId], references: [id])
+  userId       String   // Optional if you want to link directly to User as well
+  query        String
+  calls        Int      @default(1)
+  totalTimeMs  Float
+  meanTimeMs   Float
+  rowsReturned Int
+  rank         Int      // Position in top K slowest queries (1 = slowest)
+  collectedAt  DateTime @default(now())
+  createdAt    DateTime @default(now())
 }
